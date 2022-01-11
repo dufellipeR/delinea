@@ -16,3 +16,7 @@ DEBUG = False
 ALLOWED_HOSTS = [
   '*'
 ]
+
+#HEROKU SETTINGS
+django_on_heroku.settings(locals(), staticfiles=False)
+del DATABASES['default']['OPTIONS']['sslmode']
