@@ -1,9 +1,13 @@
 
 from django.contrib.auth import authenticate
+import environ
 from authentication.models import User
-import os
 import random
 from rest_framework.exceptions import AuthenticationFailed
+
+# Initialise environment variables
+env = environ.Env()
+environ.Env.read_env()
 
 
 def generate_username(name):
@@ -23,7 +27,7 @@ def register_social_user(provider, user_id, email, name):
 
         if provider == filtered_user_by_email[0].auth_provider:
             registered_user = authenticate(
-                email=email, password='b0538b4d-b703-4a37-a1b5-6b4e28ba1d08')
+                email=email, password=env('SOCIAL_SECRET'))
             # print('registered user: ' + registered_user)
             return {
                 'username': registered_user.username,
@@ -37,14 +41,14 @@ def register_social_user(provider, user_id, email, name):
     else:
         user = {
             'username': generate_username(name), 'email': email,
-            'password': 'b0538b4d-b703-4a37-a1b5-6b4e28ba1d08'}
+            'password': env()}
         user = User.objects.create_user(**user)
         user.is_verified = True
         user.auth_provider = provider
         user.save()
 
         new_user = authenticate(
-            email=email, password='b0538b4d-b703-4a37-a1b5-6b4e28ba1d08')
+            email=email, password=env('SOCIAL_SECRET'))
         return {
             'email': new_user.email,
             'username': new_user.username,
